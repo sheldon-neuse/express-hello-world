@@ -52,6 +52,7 @@
     <script>
       function main() {
         const host = location.origin.replace(/^http/, 'ws')
+        const username = prompt('名前を入力してください' || '名無し')
         const ws = new WebSocket(host + '/ws')
         ws.onopen = () => {
           ws.send(
@@ -62,7 +63,6 @@
           )
         }
         const myId = self.crypto.randomUUID().substr(0, 8)
-        const username = prompt('名前を入力してください' || '名無し')
 
         const canvas = document.getElementById('canvas')
         const ctx = canvas.getContext('2d')
@@ -122,7 +122,7 @@
           if (msg.type === 'count') {
             document.getElementById(
               'userCount'
-            ).textContent = '接続中: ${msg.count}人'
+            ).textContent = `接続中: ${msg.count}人`
           }
           if (msg.type === 'paint') {
             const { x, y, control } = msg
