@@ -34,6 +34,7 @@
     </style>
   </head>
   <body>
+    <div id="userCount">接続中: 0人</div>
     <div class="chat">
       <ul class="messages"></ul>
       <form class="form">
@@ -52,7 +53,16 @@
       function main() {
         const host = location.origin.replace(/^http/, 'ws')
         const ws = new WebSocket(host + '/ws')
+        ws.onopen = () => {
+          ws.send(
+            JSON.stringify({
+              type: 'username',
+              name: username,
+            })
+          )
+        }
         const myId = self.crypto.randomUUID().substr(0, 8)
+        const username = prompt('名前を入力してください' || '名無し')
 
         const canvas = document.getElementById('canvas')
         const ctx = canvas.getContext('2d')
@@ -109,6 +119,11 @@
 
         ws.onmessage = (event) => {
           const msg = JSON.parse(event.data)
+          if (msg.type === 'count') {
+            document.getElementById(
+              'userCount'
+            ).textContent = '接続中: ${msg.count}人'
+          }
           if (msg.type === 'paint') {
             const { x, y, control } = msg
             console.log({ control })
@@ -127,9 +142,9 @@
             const messageList = document.querySelector('.messages')
             const li = document.createElement('li')
             if (id === myId) {
-              li.textContent = `(${id})自分:` + text
+              li.textContent = `${name}(自分): ${text}`
             } else {
-              li.textContent = id + ': ' + text
+              li.textContent = `${id}: ${text}`
             }
             messageList.appendChild(li)
           }
@@ -141,7 +156,7 @@
           e.preventDefault()
           const input = document.querySelector('.input')
           const text = input.value
-          ws.send(JSON.stringify({ id: myId, text, type: 'chat' }))
+          ws.send(JSON.stringify({ text, type: 'chat', }))
           input.value = ''
           input.focus()
         }
