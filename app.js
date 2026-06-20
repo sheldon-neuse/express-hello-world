@@ -50,16 +50,19 @@ app.ws('/ws', (ws, req) => {
       })
     }
 
-    connects.forEach((socket) => {
-      if (socket.readyState === 1) {
-        // Check if the connection is open
-        socket.send(message)
-      }
-    })
+    if (msg.type === 'paint') {
+      connects.forEach((client) => {
+        if (client.ws.readyState === 1) {
+          client.ws.send(message)
+        }
+      })
+    }
   })
 
   ws.on('close', () => {
-    connects = connects.filter((conn) => conn !== ws)
+    connects = connects.filter((conn) => conn.ws !== ws)
+
+    breadcastUserCount()
   })
 })
 

@@ -52,7 +52,7 @@
     <script>
       function main() {
         const host = location.origin.replace(/^http/, 'ws')
-        const username = prompt('名前を入力してください' || '名無し')
+        const username = prompt('名前を入力してください')
         const ws = new WebSocket(host + '/ws')
         ws.onopen = () => {
           ws.send(
@@ -62,7 +62,6 @@
             })
           )
         }
-        const myId = self.crypto.randomUUID().substr(0, 8)
 
         const canvas = document.getElementById('canvas')
         const ctx = canvas.getContext('2d')
@@ -138,14 +137,17 @@
             }
           }
           if (msg.type === 'chat') {
-            const { id, text } = msg
+            const { name, text } = msg
+
             const messageList = document.querySelector('.messages')
             const li = document.createElement('li')
-            if (id === myId) {
+
+            if (name === username) {
               li.textContent = `${name}(自分): ${text}`
             } else {
-              li.textContent = `${id}: ${text}`
+              li.textContent = `${name}: ${text}`
             }
+
             messageList.appendChild(li)
           }
         }
